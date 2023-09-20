@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,10 +37,14 @@ class ItemControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        userRepository.deleteAll();
-        itemRepository.deleteAll();
         Long userId = createUser();
         createItem(userId);
+    }
+
+    @AfterEach
+    public void afterEach(){
+        userRepository.deleteAll();
+        itemRepository.deleteAll();
     }
 
     private Long createUser() {
@@ -50,12 +55,13 @@ class ItemControllerTest {
     }
 
     private void createItem(Long userId) {
-        ItemDto itemDto = ItemDto.builder()
+        Item item = Item.builder()
             .name("Item name")
             .description("Item description")
             .available(true)
+            .owner(1L)
             .build();
-        itemRepository.addItem(itemDto, userId);
+        itemRepository.addItem(item, userId);
     }
 
     @Nested

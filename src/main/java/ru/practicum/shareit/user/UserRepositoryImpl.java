@@ -2,77 +2,49 @@ package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.ConflictException;
-import ru.practicum.shareit.exception.UserNotFoundException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Repository
 public class UserRepositoryImpl implements UserRepository {
-    private final List<User> users = new ArrayList<>();
+
+    private final Map<Long, User> users = new HashMap<>();
     private long nextId = 1;
 
     @Override
     public User addUser(User user) {
-        if (duplicateEmail(user.getEmail())) {
-            throw new ConflictException("Пользователь с почтой: " +
-                user.getEmail() + " уже существует.");
-        } else {
-            user.setId(getId());
-            users.add(user);
-            log.info("Создан пользователь: {}", user);
-        }
+        user.setId(getId());
+        users.put(user.getId(), user);
+        log.info("Создан пользователь: {}", user);
         return user;
     }
 
     @Override
-    public User updateUser(Long userId, User updateUser) {
-        User existingUser = getUserById(userId);
-        if (updateUser.getName() != null) {
-            existingUser.setName(updateUser.getName());
-            log.info("Редактирование имени: {}", updateUser.getName());
-        }
-        if (updateUser.getEmail() != null) {
-            String newEmail = updateUser.getEmail();
-
-            if (!newEmail.equals(existingUser.getEmail())) {
-                if (!duplicateEmail(newEmail)) {
-                    existingUser.setEmail(newEmail);
-                    log.info("Редактирование почты: {}", updateUser.getEmail());
-                } else {
-                    throw new ConflictException("Пользователь с почтой: " +
-                        updateUser.getEmail() + " уже существует.");
-                }
-            }
-        }
-        log.info("Пользователь отредактирован: {}", existingUser);
-        return existingUser;
+    public User updateUser(Long userId, User user) {
+        users.put(userId, user);
+        log.info("Пользователь отредактирован: {}", user);
+        return user;
     }
 
     @Override
     public User getUserById(Long userId) {
-        return users.stream()
-            .filter(user -> user.getId().equals(userId))
-            .findFirst()
-            .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + userId));
+        log.info("Пользователь c id : {} , найден", userId);
+        return users.get(userId);
     }
 
     @Override
     public void deleteUserById(Long userId) {
-        if (userExists(userId)) {
-            log.info("Пользователь с id: {} - удален", userId);
-            users.removeIf(user -> user.getId().equals(userId));
-        } else {
-            throw new UserNotFoundException("Пользователь с id: " + userId);
-        }
-
+        log.info("Пользователь c id : {} , удален", userId);
+        users.remove(userId);
     }
 
     @Override
     public List<User> getAllUsers() {
-        return users;
+        return new ArrayList<>(users.values());
     }
 
     private Long getId() {
@@ -80,8 +52,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public boolean userExists(Long userId) {
-        return users.stream().anyMatch(user -> user.getId().equals(userId));
+    public boolean containsUser(Long userId) {
+        return users.containsKey(userId);
     }
 
     @Override
@@ -90,7 +62,9 @@ public class UserRepositoryImpl implements UserRepository {
         users.clear();
     }
 
-    private boolean duplicateEmail(String email) {
-        return users.stream().anyMatch(user -> user.getEmail().equals(email));
+    @Override
+    public boolean duplicateEmail(String email) {
+        return users.values().stream()
+            .anyMatch(user -> user.getEmail().equals(email));
     }
 }

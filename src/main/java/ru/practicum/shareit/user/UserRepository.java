@@ -15,5 +15,7 @@ public interface UserRepository {
 
     List<User> getAllUsers();
 
-    boolean userExists(Long userId);
+    boolean containsUser(Long userId);
+
+    boolean duplicateEmail(String email);
 }

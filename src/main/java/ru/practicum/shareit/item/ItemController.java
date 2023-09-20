@@ -40,7 +40,8 @@ public class ItemController {
                            @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("PATCH [http://localhost:8080/items/{}] : " +
             "Запрос редактирования вещи: {}, userId {}", itemId, itemDto, userId);
-        return itemService.updateItem(itemId, itemDto, userId);
+        itemDto.setId(itemId);
+        return itemService.updateItem(itemDto, userId);
     }
 
     @GetMapping("/{itemId}")
