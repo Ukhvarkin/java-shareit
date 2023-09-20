@@ -42,7 +42,7 @@ class ItemControllerTest {
     }
 
     @AfterEach
-    public void afterEach(){
+    public void afterEach() {
         userRepository.deleteAll();
         itemRepository.deleteAll();
     }

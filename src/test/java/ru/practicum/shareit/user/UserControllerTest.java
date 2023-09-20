@@ -36,7 +36,7 @@ class UserControllerTest {
     }
 
     @AfterEach
-    public void afterEach(){
+    public void afterEach() {
         userRepository.deleteAll();
     }
 
