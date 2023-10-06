@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,32 +26,32 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User addUser(@RequestBody @Valid User user) {
+    public ResponseEntity<UserDto> addUser(@RequestBody @Valid UserDto userDto) {
         log.info("POST [http://localhost:8080/users] : " +
-            "Запрос добавления пользователя: {}", user);
-        return userService.addUser(user);
+            "Запрос добавления пользователя: {}", userDto);
+        return ResponseEntity.ok(userService.addUser(userDto));
     }
 
     @PatchMapping("/{userId}")
-    public User updateUser(@PathVariable Long userId,
-                           @RequestBody User user) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long userId,
+                                              @RequestBody UserDto userDto) {
         log.info("PATCH [http://localhost:8080/users/{}] : " +
-            "Запрос редактирования пользователя с id: {} : {}", userId, userId, user);
-        return userService.updateUser(userId, user);
+            "Запрос редактирования пользователя с id: {} : {}", userId, userId, userDto);
+        return ResponseEntity.ok(userService.updateUser(userId, userDto));
     }
 
     @GetMapping("/{userId}")
-    public User getUserById(@PathVariable Long userId) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long userId) {
         log.info("GET [http://localhost:8080/users/{}] : " +
             "Запрос получения пользователя по id", userId);
-        return userService.getUserById(userId);
+        return ResponseEntity.ok(userService.findUserById(userId));
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public ResponseEntity<List<UserDto>> getAllUsers() {
         log.info("GET [http://localhost:8080/users] : " +
             "Запрос списка всех пользователей");
-        return userService.getAllUsers();
+        return ResponseEntity.ok(userService.findAllUsers());
     }
 
     @DeleteMapping("/{userId}")

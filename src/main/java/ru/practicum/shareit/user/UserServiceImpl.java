@@ -3,9 +3,10 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -15,59 +16,52 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User addUser(User user) {
-        if (userRepository.duplicateEmail(user.getEmail())) {
-            throw new ConflictException("Пользователь с почтой: " + user.getEmail() + " уже существует.");
-        } else {
-            return userRepository.addUser(user);
+    public UserDto addUser(UserDto userDto) {
+        if (userDto.getEmail() == null || userDto.getEmail().length() == 0) {
+            throw new ValidationException("Некорректный ввод. Пустое поле email.");
         }
+        User user = UserMapper.MAPPER.toUser(userDto);
+        return UserMapper.MAPPER.toUserDto(userRepository.save(user));
     }
 
 
     @Override
-    public User updateUser(Long userId, User user) {
-        User existingUser = getUserById(userId);
-        if (user.getName() != null) {
-            existingUser.setName(user.getName());
-            log.info("Редактирование имени: {}", user.getName());
+    public UserDto updateUser(Long userId, UserDto userDto) {
+        User existingUser = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + userId));
+
+        if (userDto.getName() != null) {
+            existingUser.setName(userDto.getName());
+            log.info("Редактирование имени: {}", userDto.getName());
         }
-        if (user.getEmail() != null) {
-            String newEmail = user.getEmail();
-            if (!newEmail.equals(existingUser.getEmail())) {
-                if (!userRepository.duplicateEmail(newEmail)) {
-                    existingUser.setEmail(newEmail);
-                    log.info("Редактирование почты: {}", user.getEmail());
-                } else {
-                    throw new ConflictException(
-                        "Пользователь с почтой: " + user.getEmail() + " уже существует.");
-                }
-            }
+        if (userDto.getEmail() != null) {
+            log.info("Редактирование почты: {}", userDto.getEmail());
+            existingUser.setEmail(userDto.getEmail());
         }
-        return userRepository.updateUser(userId, existingUser);
+        return UserMapper.MAPPER.toUserDto(userRepository.save(existingUser));
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.getAllUsers();
+    public List<UserDto> findAllUsers() {
+        List<User> users = userRepository.findAll();
+        List<UserDto> result = new ArrayList<>();
+        for (User user :
+            users) {
+            result.add(UserMapper.MAPPER.toUserDto(user));
+        }
+        return result;
     }
 
     @Override
-    public User getUserById(Long userId) {
-        if (userRepository.containsUser(userId)) {
-            return userRepository.getUserById(userId);
-        } else {
-            throw new UserNotFoundException("Пользователь с id: " + userId);
-        }
+    public UserDto findUserById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + userId));
+        return UserMapper.MAPPER.toUserDto(user);
     }
 
     @Override
     public void deleteUserById(Long userId) {
-        if (userRepository.containsUser(userId)) {
-            userRepository.deleteUserById(userId);
-        } else {
-            throw new UserNotFoundException("Пользователь с id: " + userId);
-        }
-
+        userRepository.deleteById(userId);
     }
 
 }

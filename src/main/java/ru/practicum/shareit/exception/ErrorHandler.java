@@ -14,7 +14,7 @@ public class ErrorHandler {
     public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
         String message = "Пользователь не найден.";
         log.error(message, e);
-        return new ErrorResponse(message, e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler()
@@ -22,18 +22,28 @@ public class ErrorHandler {
     public ErrorResponse handleItemNotFoundException(ItemNotFoundException e) {
         String message = "Вещь не найдена.";
         log.error(message, e);
-        return new ErrorResponse(message, e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler()
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleItemNotFoundException(BookingNotFoundException e) {
+        String message = "Бронирование не найдено.";
+        log.error(message, e);
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler()
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleUserAlreadyExistsException(ValidationException e) {
-        return new ErrorResponse("Ошибка ввода данных.", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler()
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleUserConflictException(ConflictException e) {
-        return new ErrorResponse("Конфликт данных.", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
+
+
 }
