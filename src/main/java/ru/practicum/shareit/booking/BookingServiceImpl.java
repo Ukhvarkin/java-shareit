@@ -41,12 +41,18 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new ValidationException("Бронь недоступна.");
         }
+        User booker = userRepository.findById(bookerId)
+            .orElseThrow(() -> new UserNotFoundException("Пользователя с id: " + bookerId + " не существует."));
+        if (bookerId.equals(item.getOwner().getId())) {
+            throw new ItemNotFoundException("Вы не можете забронировать свою вещь");
+        }
+        log.info("Найден пользователь с id: {}", booker.getId());
 
-        if (!bookingRepository.findByItemIdAndStartBeforeAndEndAfterAndStatusEqualsOrderByStartAsc(
+        if (!bookingRepository.findBookingsByItemIdAndTimeRangeAndStatus(
             item.getId(),
             bookingDto.getStart(),
             bookingDto.getEnd(), BookingStatus.APPROVED).isEmpty()
-            || !bookingRepository.findByItemIdAndStartAfterAndEndBeforeAndStatusEqualsOrderByStartAsc(
+            || !bookingRepository.findByItemIdAndTimeRangeAndStatus(
             item.getId(),
             bookingDto.getStart(),
             bookingDto.getEnd(), BookingStatus.APPROVED).isEmpty()
@@ -63,14 +69,6 @@ public class BookingServiceImpl implements BookingService {
 
             throw new BookingNotFoundException("В данный момент бронирование не доступно.");
         }
-
-
-        User booker = userRepository.findById(bookerId)
-            .orElseThrow(() -> new UserNotFoundException("Пользователя с id: " + bookerId + " не существует."));
-        if (bookerId.equals(item.getOwner().getId())) {
-            throw new ItemNotFoundException("Вы не можете забронировать свою вещь");
-        }
-        log.info("Найден пользователь с id: {}", booker.getId());
 
         Booking booking = bookingMapper.toBooking(bookingDto, item, booker, BookingStatus.WAITING);
 
@@ -89,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
         if (!userId.equals(booking.getItem().getOwner().getId())) {
             throw new UserNotFoundException("Только владелец может подтверждать или отклонять бронирование.");
         }
-        if (booking.getStatus().equals(BookingStatus.APPROVED)) {
+        if (!booking.getStatus().equals(BookingStatus.WAITING)) {
             throw new ValidationException("Бронирование уже подтверждено.");
         }
         booking.setStatus(status ? BookingStatus.APPROVED : BookingStatus.REJECTED);
@@ -112,38 +110,36 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findAllBookingByUserId(Long userId, String state) {
+    public List<BookingResponseDto> findAllBookingByUserId(Long userId, BookingState state) {
         userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("С id: " + userId));
         List<Booking> result = null;
         LocalDateTime time = LocalDateTime.now();
 
         switch (state) {
-            case "ALL":
+            case ALL:
                 result = bookingRepository.findByBookerIdOrderByStartDesc(userId);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 result = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                     userId, time, time);
                 break;
-            case "PAST":
+            case PAST:
                 result = bookingRepository.findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
                     userId, time, BookingStatus.APPROVED);
                 break;
-            case "FUTURE":
+            case FUTURE:
                 result = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(
                     userId, time);
                 break;
-            case "WAITING":
+            case WAITING:
                 result = bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(
                     userId, BookingStatus.WAITING);
                 break;
-            case "REJECTED":
+            case REJECTED:
                 result = bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(
                     userId, BookingStatus.REJECTED);
                 break;
-            default:
-                throw new ValidationException("Unknown state: " + state);
         }
 
         return result.stream()
@@ -152,7 +148,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findAllBookingByOwnerId(Long ownerId, String state) {
+    public List<BookingResponseDto> findAllBookingByOwnerId(Long ownerId, BookingState state) {
         userRepository.findById(ownerId)
             .orElseThrow(() -> new UserNotFoundException("С id: " + ownerId));
 
@@ -163,31 +159,29 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> result = null;
 
         switch (state) {
-            case "ALL":
+            case ALL:
                 result = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 result = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                     ownerId, time, time);
                 break;
-            case "PAST":
+            case PAST:
                 result = bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
                     ownerId, time, BookingStatus.APPROVED);
                 break;
-            case "FUTURE":
+            case FUTURE:
                 result = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(
                     ownerId, time);
                 break;
-            case "WAITING":
+            case WAITING:
                 result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(
                     ownerId, BookingStatus.WAITING);
                 break;
-            case "REJECTED":
+            case REJECTED:
                 result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(
                     ownerId, BookingStatus.REJECTED);
                 break;
-            default:
-                throw new ValidationException("Unknown state: " + state);
         }
         return result.stream()
             .map(bookingMapper::toBookingResponseDto)

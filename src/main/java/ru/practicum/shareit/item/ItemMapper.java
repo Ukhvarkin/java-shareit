@@ -4,17 +4,17 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
+import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.user.User;
 
 import java.util.List;
 
 @Mapper
 public interface ItemMapper {
-
-    @Mapping(target = "owner", ignore = true)
-    @Mapping(target = "request", ignore = true)
-    @Mapping(target = "comments", ignore = true)
-    Item toItem(ItemDto itemDto);
+    @Mapping(target = "id", source = "itemDto.id")
+    @Mapping(target = "name", source = "itemDto.name")
+    Item toItem(ItemDto itemDto, User owner, List<Comment> comments);
 
     default ItemDto toItemDto(Item item, BookingItemDto lastBooking, BookingItemDto nextBooking,
                               List<CommentDto> comments) {

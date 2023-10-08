@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
@@ -18,4 +19,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllByOwnerId(Long ownerId);
 
     List<Item> findAllByOwnerId(Long ownerId, Pageable page);
+
+    Optional<Item> findByIdAndOwner_Id(Long id, Long userId);
 }

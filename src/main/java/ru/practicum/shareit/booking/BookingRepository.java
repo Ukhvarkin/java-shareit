@@ -40,30 +40,27 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByItemOwnerIdAndStatusEqualsOrderByStartDesc(Long userId, BookingStatus status);
 
-    @Query("select b from Booking b " +
-        "where b.item.id = ?1 and " +
-        "b.item.owner.id = ?2 and " +
-        "b.end < ?3 order by b.start desc")
-    List<Booking> findPastOwnerBookings(long itemId, long ownerId, LocalDateTime now);
-
-    @Query("select b from Booking b " +
-        "where b.item.id = ?1 and " +
-        "b.item.owner.id = ?2 and " +
-        "b.start > ?3 " +
-        "order by b.start desc")
-    List<Booking> findFutureOwnerBookings(long itemId, long ownerId, LocalDateTime now);
-
     Long countAllByItemIdAndBookerIdAndEndBefore(long itemId, long userId, LocalDateTime now);
 
-    List<Booking> findByItemIdAndStartBeforeAndEndAfterAndStatusEqualsOrderByStartAsc(Long userId, LocalDateTime start,
-                                                                                      LocalDateTime end,
-                                                                                      BookingStatus status);
+    @Query("SELECT b FROM Booking b " +
+        "WHERE b.item.id = ?1 " +
+        "AND b.end > ?2 " +
+        "AND b.start < ?3 " +
+        "AND b.status = ?4 " +
+        "ORDER BY b.start ASC")
+    List<Booking> findBookingsByItemIdAndTimeRangeAndStatus(Long userId, LocalDateTime start,
+                                                            LocalDateTime end,
+                                                            BookingStatus status);
 
-    List<Booking> findByItemIdAndStartAfterAndEndBeforeAndStatusEqualsOrderByStartAsc(Long id, LocalDateTime start,
-                                                                                      LocalDateTime end,
-                                                                                      BookingStatus status);
+    @Query("SELECT b FROM Booking b " +
+        "WHERE b.item.id = ?1 " +
+        "AND b.start > ?2 " +
+        "AND b.end < ?3 " +
+        "AND b.status = ?4 " +
+        "ORDER BY b.start ASC")
+    List<Booking> findByItemIdAndTimeRangeAndStatus(Long id, LocalDateTime start,
+                                                    LocalDateTime end,
+                                                    BookingStatus status);
 
     List<Booking> findByItemId(Long id);
-
-
 }

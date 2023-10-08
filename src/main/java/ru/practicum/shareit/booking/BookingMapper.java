@@ -11,8 +11,8 @@ import ru.practicum.shareit.user.User;
 public interface BookingMapper {
 
     @Mapping(target = "id", expression = "java(null)")
-    @Mapping(target = "item", expression = "java(item)")
-    @Mapping(target = "booker", expression = "java(user)")
+    @Mapping(target = "item", source = "item")
+    @Mapping(target = "booker", source = "user")
     Booking toBooking(BookingRequestDto bookingDto, Item item, User user, BookingStatus status);
 
     BookingResponseDto toBookingResponseDto(Booking booking);

@@ -2,7 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
@@ -49,6 +49,6 @@ public class Item {
     private ItemRequest request;
 
     @Transient
-    private List<CommentDto> comments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
 }

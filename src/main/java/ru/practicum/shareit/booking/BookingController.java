@@ -64,23 +64,21 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingResponseDto>> findBookingByUserId(
         @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
-        @RequestParam(required = false, defaultValue = "ALL") String state,
-        @RequestParam(defaultValue = "0") int from,
-        @RequestParam(defaultValue = "10") int size) {
+        @RequestParam(required = false, defaultValue = "ALL") String state
+    ) {
         log.info("GET [http://localhost:8080/bookings] : " +
             "Получение списка всех бронирований текущего пользователя id: {}, state: {}", userId, state);
-        return ResponseEntity.ok(bookingService.findAllBookingByUserId(userId, state));
+        return ResponseEntity.ok(bookingService.findAllBookingByUserId(userId, BookingState.fromString(state)));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingResponseDto>> findBookingByOwnerId(
         @RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId,
-        @RequestParam(required = false, defaultValue = "ALL") String state,
-        @RequestParam(defaultValue = "0") int from,
-        @RequestParam(defaultValue = "10") int size) {
+        @RequestParam(required = false, defaultValue = "ALL") String state
+    ) {
         log.info("GET [http://localhost:8080/bookings/owner] : " +
             "Получение списка бронирований для всех вещей текущего пользователя id: {}, state: {}", ownerId, state);
-        return ResponseEntity.ok(bookingService.findAllBookingByOwnerId(ownerId, state));
+        return ResponseEntity.ok(bookingService.findAllBookingByOwnerId(ownerId, BookingState.fromString(state)));
     }
 
 }
