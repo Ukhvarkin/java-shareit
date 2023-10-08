@@ -10,7 +10,7 @@ public enum BookingState {
     WAITING,
     REJECTED;
 
-    static BookingState fromString(String x) throws RuntimeException {
+    static BookingState stateValid(String x) throws RuntimeException {
         for (BookingState currentType : BookingState.values()) {
             if (x.equals(currentType.toString())) {
                 return currentType;

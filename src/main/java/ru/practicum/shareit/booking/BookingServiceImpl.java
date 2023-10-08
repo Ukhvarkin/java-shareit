@@ -48,31 +48,28 @@ public class BookingServiceImpl implements BookingService {
         }
         log.info("Найден пользователь с id: {}", booker.getId());
 
-        if (!bookingRepository.findBookingsByItemIdAndTimeRangeAndStatus(
-            item.getId(),
-            bookingDto.getStart(),
-            bookingDto.getEnd(), BookingStatus.APPROVED).isEmpty()
-            || !bookingRepository.findByItemIdAndTimeRangeAndStatus(
-            item.getId(),
-            bookingDto.getStart(),
-            bookingDto.getEnd(), BookingStatus.APPROVED).isEmpty()
-            || !bookingRepository.findByItemId(item.getId())
-            .stream().filter(booking -> booking.getStart().isBefore(bookingDto.getStart()) &&
-                booking.getEnd().isBefore(bookingDto.getEnd()) &&
-                booking.getEnd().isAfter(bookingDto.getStart()))
-            .collect(Collectors.toList()).isEmpty() || !bookingRepository.findByItemId(item.getId())
-            .stream()
-            .filter(booking -> booking.getStart().isAfter(bookingDto.getStart()) &&
-                booking.getStart().isBefore(bookingDto.getEnd()) &&
-                booking.getEnd().isAfter(bookingDto.getEnd()))
-            .collect(Collectors.toList()).isEmpty()) {
+        Long itemId = item.getId();
+        LocalDateTime bookingStart = bookingDto.getStart();
+        LocalDateTime bookingEnd = bookingDto.getEnd();
 
+        if (hasApprovedBookings(itemId, bookingStart, bookingEnd) ||
+            hasOverlappingBookings(itemId, bookingStart, bookingEnd)) {
             throw new BookingNotFoundException("В данный момент бронирование не доступно.");
         }
 
         Booking booking = bookingMapper.toBooking(bookingDto, item, booker, BookingStatus.WAITING);
-
         return bookingMapper.toBookingResponseDto(bookingRepository.save(booking));
+    }
+
+    private boolean hasApprovedBookings(Long itemId, LocalDateTime start, LocalDateTime end) {
+        return !bookingRepository.findBookingsByItemIdAndTimeRangeAndStatus(
+            itemId, start, end, BookingStatus.APPROVED).isEmpty()
+            || !bookingRepository.findByItemIdAndTimeRangeAndStatus(
+            itemId, start, end, BookingStatus.APPROVED).isEmpty();
+    }
+
+    private boolean hasOverlappingBookings(Long itemId, LocalDateTime start, LocalDateTime end) {
+        return bookingRepository.hasOverlappingBookings1(itemId, start, end);
     }
 
     @Override

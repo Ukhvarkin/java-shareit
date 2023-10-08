@@ -68,7 +68,7 @@ public class BookingController {
     ) {
         log.info("GET [http://localhost:8080/bookings] : " +
             "Получение списка всех бронирований текущего пользователя id: {}, state: {}", userId, state);
-        return ResponseEntity.ok(bookingService.findAllBookingByUserId(userId, BookingState.fromString(state)));
+        return ResponseEntity.ok(bookingService.findAllBookingByUserId(userId, BookingState.stateValid(state)));
     }
 
     @GetMapping("/owner")
@@ -78,7 +78,7 @@ public class BookingController {
     ) {
         log.info("GET [http://localhost:8080/bookings/owner] : " +
             "Получение списка бронирований для всех вещей текущего пользователя id: {}, state: {}", ownerId, state);
-        return ResponseEntity.ok(bookingService.findAllBookingByOwnerId(ownerId, BookingState.fromString(state)));
+        return ResponseEntity.ok(bookingService.findAllBookingByOwnerId(ownerId, BookingState.stateValid(state)));
     }
 
 }

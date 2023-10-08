@@ -21,7 +21,6 @@ import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -169,10 +168,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private List<CommentDto> getCommentForItem(Item item) {
-        return commentRepository.getAllByItemId(item.getId())
+        return commentRepository.getAllByItemIdOrderByCreatedAsc(item.getId())
             .stream()
             .map(commentMapper::toCommentDto)
-            .sorted(Comparator.comparing(CommentDto::getCreated))
             .collect(Collectors.toList());
     }
 

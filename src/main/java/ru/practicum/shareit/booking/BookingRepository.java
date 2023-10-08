@@ -62,5 +62,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                                     LocalDateTime end,
                                                     BookingStatus status);
 
-    List<Booking> findByItemId(Long id);
+    @Query("SELECT COUNT(b) > 0 FROM Booking b " +
+        "WHERE b.item.id = ?1 " +
+        "AND ((b.start < ?3 AND b.end > ?2) OR (b.start <= ?2 AND b.end >= ?3))")
+    boolean hasOverlappingBookings1(Long itemId, LocalDateTime start, LocalDateTime end);
 }
