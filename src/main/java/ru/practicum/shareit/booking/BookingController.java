@@ -2,7 +2,9 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,8 @@ import ru.practicum.shareit.booking.dto.BookingResponseDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -26,6 +30,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
+@Validated
 public class BookingController {
 
     private final BookingService bookingService;
@@ -64,21 +69,27 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingResponseDto>> findBookingByUserId(
         @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
-        @RequestParam(required = false, defaultValue = "ALL") String state
+        @RequestParam(required = false, defaultValue = "ALL") String state,
+        @Valid @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+        @Valid @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
         log.info("GET [http://localhost:8080/bookings] : " +
             "Получение списка всех бронирований текущего пользователя id: {}, state: {}", userId, state);
-        return ResponseEntity.ok(bookingService.findAllBookingByUserId(userId, BookingState.stateValid(state)));
+        return ResponseEntity.ok(bookingService.findAllBookingByUserId(userId, BookingState.stateValid(state),
+            PageRequest.of(from / size, size)));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingResponseDto>> findBookingByOwnerId(
         @RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId,
-        @RequestParam(required = false, defaultValue = "ALL") String state
+        @RequestParam(required = false, defaultValue = "ALL") String state,
+        @Valid @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+        @Valid @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
         log.info("GET [http://localhost:8080/bookings/owner] : " +
             "Получение списка бронирований для всех вещей текущего пользователя id: {}, state: {}", ownerId, state);
-        return ResponseEntity.ok(bookingService.findAllBookingByOwnerId(ownerId, BookingState.stateValid(state)));
+        return ResponseEntity.ok(bookingService.findAllBookingByOwnerId(ownerId, BookingState.stateValid(state),
+            PageRequest.of(from / size, size)));
     }
 
 }

@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -42,7 +43,8 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Бронь недоступна.");
         }
         User booker = userRepository.findById(bookerId)
-            .orElseThrow(() -> new UserNotFoundException("Пользователя с id: " + bookerId + " не существует."));
+            .orElseThrow(
+                () -> new UserNotFoundException("Не найден пользователь с id: " + bookerId + " не существует."));
         if (bookerId.equals(item.getOwner().getId())) {
             throw new ItemNotFoundException("Вы не можете забронировать свою вещь");
         }
@@ -76,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponseDto approveBooking(Long bookingId, Long userId, boolean status) {
         userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("Пользователя с id: " + userId + " не существует."));
+            .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id: " + userId + " не существует."));
 
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new BookingNotFoundException("Нет бронирования с id: " + bookingId));
@@ -95,7 +97,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto findBookingById(Long bookingId, Long userId) {
         userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + userId + " не существует."));
+            .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id: " + userId + " не существует."));
 
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new BookingNotFoundException("Нет бронирования с id: " + bookingId));
@@ -107,35 +109,35 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findAllBookingByUserId(Long userId, BookingState state) {
+    public List<BookingResponseDto> findAllBookingByUserId(Long userId, BookingState state, Pageable pageable) {
         userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("С id: " + userId));
+            .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id: " + userId));
         List<Booking> result = null;
         LocalDateTime time = LocalDateTime.now();
 
         switch (state) {
             case ALL:
-                result = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                result = bookingRepository.findByBookerIdOrderByStartDesc(userId, pageable).toList();
                 break;
             case CURRENT:
-                result = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                    userId, time, time);
+                result = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartAsc(
+                    userId, time, time, pageable).toList();
                 break;
             case PAST:
                 result = bookingRepository.findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
-                    userId, time, BookingStatus.APPROVED);
+                    userId, time, BookingStatus.APPROVED, pageable).toList();
                 break;
             case FUTURE:
                 result = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(
-                    userId, time);
+                    userId, time, pageable).toList();
                 break;
             case WAITING:
                 result = bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(
-                    userId, BookingStatus.WAITING);
+                    userId, BookingStatus.WAITING, pageable).toList();
                 break;
             case REJECTED:
                 result = bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(
-                    userId, BookingStatus.REJECTED);
+                    userId, BookingStatus.REJECTED, pageable).toList();
                 break;
         }
 
@@ -145,9 +147,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findAllBookingByOwnerId(Long ownerId, BookingState state) {
+    public List<BookingResponseDto> findAllBookingByOwnerId(Long ownerId, BookingState state, Pageable pageable) {
         userRepository.findById(ownerId)
-            .orElseThrow(() -> new UserNotFoundException("С id: " + ownerId));
+            .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id: " + ownerId));
 
         if (itemRepository.findAllByOwnerId(ownerId).isEmpty()) {
             throw new ValidationException("У вас нет вещей. Сначала нужно добавить вещь.");
@@ -157,27 +159,27 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case ALL:
-                result = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
+                result = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId, pageable).toList();
                 break;
             case CURRENT:
                 result = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                    ownerId, time, time);
+                    ownerId, time, time, pageable).toList();
                 break;
             case PAST:
                 result = bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
-                    ownerId, time, BookingStatus.APPROVED);
+                    ownerId, time, BookingStatus.APPROVED, pageable).toList();
                 break;
             case FUTURE:
                 result = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(
-                    ownerId, time);
+                    ownerId, time, pageable).toList();
                 break;
             case WAITING:
                 result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(
-                    ownerId, BookingStatus.WAITING);
+                    ownerId, BookingStatus.WAITING, pageable).toList();
                 break;
             case REJECTED:
                 result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(
-                    ownerId, BookingStatus.REJECTED);
+                    ownerId, BookingStatus.REJECTED, pageable).toList();
                 break;
         }
         return result.stream()

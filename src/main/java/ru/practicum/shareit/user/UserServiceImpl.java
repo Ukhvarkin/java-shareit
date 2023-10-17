@@ -14,14 +14,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto addUser(UserDto userDto) {
         if (userDto.getEmail() == null || userDto.getEmail().length() == 0) {
             throw new ValidationException("Некорректный ввод. Пустое поле email.");
         }
-        User user = UserMapper.MAPPER.toUser(userDto);
-        return UserMapper.MAPPER.toUserDto(userRepository.save(user));
+        User user = userMapper.toUser(userDto);
+        return userMapper.toUserDto(userRepository.save(user));
     }
 
 
@@ -38,7 +39,7 @@ public class UserServiceImpl implements UserService {
             log.info("Редактирование почты: {}", userDto.getEmail());
             existingUser.setEmail(userDto.getEmail());
         }
-        return UserMapper.MAPPER.toUserDto(userRepository.save(existingUser));
+        return userMapper.toUserDto(userRepository.save(existingUser));
     }
 
     @Override
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
         List<UserDto> result = new ArrayList<>();
         for (User user :
             users) {
-            result.add(UserMapper.MAPPER.toUserDto(user));
+            result.add(userMapper.toUserDto(user));
         }
         return result;
     }
@@ -55,8 +56,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findUserById(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + userId));
-        return UserMapper.MAPPER.toUserDto(user);
+            .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id: " + userId));
+        return userMapper.toUserDto(user);
     }
 
     @Override
