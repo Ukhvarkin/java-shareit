@@ -37,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
         }
         validBookingTime(bookingDto);
         Item item = itemRepository.findById(bookingDto.getItemId())
-            .orElseThrow(() -> new ItemNotFoundException("Вещь с id: " + bookingDto.getItemId()));
+            .orElseThrow(() -> new ItemNotFoundException("Не найдена вещь с id: " + bookingDto.getItemId()));
         log.info("Найдена вещь с id: {}", item.getId());
         if (!item.getAvailable()) {
             throw new ValidationException("Бронь недоступна.");
@@ -100,7 +100,7 @@ public class BookingServiceImpl implements BookingService {
             .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id: " + userId + " не существует."));
 
         Booking booking = bookingRepository.findById(bookingId)
-            .orElseThrow(() -> new BookingNotFoundException("Нет бронирования с id: " + bookingId));
+            .orElseThrow(() -> new BookingNotFoundException("Не существует бронирования с id: " + bookingId));
 
         if (!userId.equals(booking.getBooker().getId()) && !userId.equals(booking.getItem().getOwner().getId())) {
             throw new UserNotFoundException("Просмотр бронирования доступно только автору или владельцу.");

@@ -19,8 +19,8 @@ class UserRepositoryTest {
     private final UserRepository userRepository;
     private final User user = User.builder()
         .id(1L)
-        .name("user1")
-        .email("mail@yandex.ru")
+        .name("One")
+        .email("one@yandex.ru")
         .build();
 
     @BeforeEach

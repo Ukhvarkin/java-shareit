@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long userId, UserDto userDto) {
         User existingUser = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + userId));
+            .orElseThrow(() -> new UserNotFoundException("Не существует пользователь с id: " + userId));
 
         if (userDto.getName() != null) {
             existingUser.setName(userDto.getName());

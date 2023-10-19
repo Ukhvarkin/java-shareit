@@ -77,7 +77,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponseDto getItemById(Long itemId, Long userId) {
         Item existingItem = itemRepository.findById(itemId)
-            .orElseThrow(() -> new ItemNotFoundException("Вещь с id: " + itemId));
+            .orElseThrow(() -> new ItemNotFoundException("Не существует вещи с id: " + itemId));
 
         if (!Objects.equals(userId, existingItem.getOwner().getId())) {
             return itemMapper.toItemResponseDto(existingItem, null, null, getCommentForItem(existingItem));
@@ -92,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
         Pageable page = PageRequest.of(from, size);
 
         userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + userId));
+            .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id: " + userId));
 
         List<Item> items = itemRepository.findAllByOwnerId(userId, page).toList();
         return getItemDto(items);
@@ -126,7 +126,7 @@ public class ItemServiceImpl implements ItemService {
         commentDtoValidation(commentDto);
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + userId));
+            .orElseThrow(() -> new UserNotFoundException("Не существует пользователя с id: " + userId));
 
         Long bookingsCount =
             bookingRepository.countAllByItemIdAndBookerIdAndEndBefore(itemId, userId, LocalDateTime.now());
@@ -135,7 +135,7 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("Вы не брали эту вещь в аренду.");
         }
         Item item = itemRepository.findById(itemId)
-            .orElseThrow(() -> new UserNotFoundException("Вещь с id: " + itemId));
+            .orElseThrow(() -> new ItemNotFoundException("Не найдена вещь с id: " + itemId));
 
         Comment comment = commentMapper.toComment(commentDto, item, user);
         comment.setCreated(LocalDateTime.now());
@@ -151,7 +151,7 @@ public class ItemServiceImpl implements ItemService {
             return null;
         } else {
             Booking lastBooking = bookings.get(0);
-            return itemMapper.bookingToBookingItemDto(lastBooking);
+            return itemMapper.toBookingItemDto(lastBooking);
         }
     }
 
@@ -163,7 +163,7 @@ public class ItemServiceImpl implements ItemService {
             return null;
         } else {
             Booking nextBooking = bookings.get(0);
-            return itemMapper.bookingToBookingItemDto(nextBooking);
+            return itemMapper.toBookingItemDto(nextBooking);
         }
     }
 

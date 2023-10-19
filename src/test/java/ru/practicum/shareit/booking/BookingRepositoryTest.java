@@ -38,17 +38,17 @@ class BookingRepositoryTest {
     private final LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
     private final User user1 = User.builder()
         .id(1L)
-        .name("user1")
-        .email("mail@yandex.ru")
+        .name("One")
+        .email("one@yandex.ru")
         .build();
     private final User user2 = User.builder()
         .id(2L)
-        .name("user2")
-        .email("email@yandex.ru")
+        .name("Two")
+        .email("two@yandex.ru")
         .build();
     private final Item item1 = Item.builder()
         .id(1L)
-        .name("item1")
+        .name("item")
         .description("description")
         .available(true)
         .owner(user1)

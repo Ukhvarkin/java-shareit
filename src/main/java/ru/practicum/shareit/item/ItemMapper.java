@@ -21,12 +21,10 @@ public interface ItemMapper {
 
     @Mapping(target = "id", expression = "java(item.getId())")
     @Mapping(target = "ownerId", expression = "java(item.getOwner().getId())")
-    @Mapping(target = "lastBooking", expression = "java(lastBooking)")
-    @Mapping(target = "nextBooking", expression = "java(nextBooking)")
-    @Mapping(target = "comments", expression = "java(comments)")
+    @Mapping(target = "comments", source = "comments")
     ItemResponseDto toItemResponseDto(Item item, BookingItemDto lastBooking, BookingItemDto nextBooking,
                                       List<CommentDto> comments);
 
     @Mapping(target = "bookerId", expression = "java(booking.getBooker().getId())")
-    BookingItemDto bookingToBookingItemDto(Booking booking);
+    BookingItemDto toBookingItemDto(Booking booking);
 }

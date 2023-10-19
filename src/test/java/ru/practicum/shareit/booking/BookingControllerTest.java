@@ -36,10 +36,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = BookingController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class BookingControllerTest {
+    @MockBean
+    private BookingService bookingService;
+    private BookingRequestDto bookingRequestDto;
+    private BookingResponseDto bookingResponseDto;
+
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
-    private int from;
-    private int size;
+    private final int from = 0;
+    private final int size = 10;
     private final User user1 = User.builder()
         .id(1L)
         .name("One")
@@ -81,28 +86,21 @@ class BookingControllerTest {
         .status(BookingStatus.WAITING)
         .build();
 
-    @MockBean
-    private BookingService bookingService;
-    private BookingRequestDto bookingRequestDto;
-    private BookingResponseDto bookingResponseDto;
-
     @BeforeEach
     public void beforeEach() {
         bookingRequestDto = BookingRequestDto.builder()
-            .start(LocalDateTime.now().plusMinutes(5))
-            .end(LocalDateTime.now().plusMinutes(10))
+            .start(LocalDateTime.now().plusMinutes(1))
+            .end(LocalDateTime.now().plusMinutes(5))
             .itemId(1L)
             .build();
         bookingResponseDto = BookingResponseDto.builder()
             .id(1L)
-            .start(LocalDateTime.now().plusMinutes(5))
-            .end(LocalDateTime.now().plusMinutes(10))
+            .start(LocalDateTime.now().plusMinutes(1))
+            .end(LocalDateTime.now().plusMinutes(5))
             .item(itemDto)
             .booker(userDto2)
             .status(BookingStatus.WAITING)
             .build();
-        from = 0;
-        size = 10;
     }
 
     @Nested
