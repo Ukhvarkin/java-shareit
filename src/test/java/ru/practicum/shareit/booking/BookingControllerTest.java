@@ -11,13 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
-import ru.practicum.shareit.item.ItemResponseDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -45,6 +47,9 @@ class BookingControllerTest {
     private final MockMvc mockMvc;
     private final int from = 0;
     private final int size = 10;
+    private final Pageable pageable =
+        PageRequest.of(from / size, size, Sort.by(Sort.Order.desc("start")));
+
     private final User user1 = User.builder()
         .id(1L)
         .name("One")
@@ -245,10 +250,11 @@ class BookingControllerTest {
         @Test
         @DisplayName("Получение бронирования пользователем, state: default, from: 0, size: 10")
         public void methodGet_WithDefaultStateByUserTest() throws Exception {
+
             when(bookingService.findAllBookingByUserId(
                 ArgumentMatchers.eq(userDto2.getId()),
                 ArgumentMatchers.eq(BookingState.ALL),
-                ArgumentMatchers.eq(PageRequest.of(from / size, size))))
+                ArgumentMatchers.eq(pageable)))
                 .thenReturn(List.of(bookingResponseDto1, bookingResponseDto2));
 
             mockMvc.perform(get("/bookings?from={from}&size={size}", from, size)
@@ -261,7 +267,7 @@ class BookingControllerTest {
                 .findAllBookingByUserId(
                     ArgumentMatchers.eq(userDto2.getId()),
                     ArgumentMatchers.eq(BookingState.ALL),
-                    ArgumentMatchers.eq(PageRequest.of(from / size, size)));
+                    ArgumentMatchers.eq(pageable));
         }
 
         @Test
@@ -270,7 +276,7 @@ class BookingControllerTest {
             when(bookingService.findAllBookingByUserId(
                 ArgumentMatchers.eq(userDto2.getId()),
                 ArgumentMatchers.eq(BookingState.ALL),
-                ArgumentMatchers.eq(PageRequest.of(from / size, size))))
+                ArgumentMatchers.eq(pageable)))
                 .thenReturn(List.of(bookingResponseDto1, bookingResponseDto2));
 
             mockMvc.perform(get("/bookings?state={state}&from={from}&size={size}", "ALL", from, size)
@@ -283,7 +289,7 @@ class BookingControllerTest {
                 .findAllBookingByUserId(
                     ArgumentMatchers.eq(userDto2.getId()),
                     ArgumentMatchers.eq(BookingState.ALL),
-                    ArgumentMatchers.eq(PageRequest.of(from / size, size)));
+                    ArgumentMatchers.eq(pageable));
         }
 
         @Test
@@ -303,7 +309,7 @@ class BookingControllerTest {
             when(bookingService.findAllBookingByOwnerId(
                 ArgumentMatchers.eq(itemDto.getOwnerId()),
                 ArgumentMatchers.eq(BookingState.ALL),
-                ArgumentMatchers.eq(PageRequest.of(from / size, size))))
+                ArgumentMatchers.eq(pageable)))
                 .thenReturn(List.of(bookingResponseDto1, bookingResponseDto2));
 
             mockMvc.perform(get("/bookings/owner?state={state}&from={from}&size={size}", "ALL", from, size)
@@ -316,7 +322,7 @@ class BookingControllerTest {
                 .findAllBookingByOwnerId(ArgumentMatchers.eq(
                         itemDto.getOwnerId()),
                     ArgumentMatchers.eq(BookingState.ALL),
-                    ArgumentMatchers.eq(PageRequest.of(from / size, size)));
+                    ArgumentMatchers.eq(pageable));
         }
 
         @Test
@@ -325,7 +331,7 @@ class BookingControllerTest {
             when(bookingService.findAllBookingByOwnerId(
                 ArgumentMatchers.eq(itemDto.getOwnerId()),
                 ArgumentMatchers.eq(BookingState.ALL),
-                ArgumentMatchers.eq(PageRequest.of(from / size, size))))
+                ArgumentMatchers.eq(pageable)))
                 .thenReturn(List.of(bookingResponseDto1, bookingResponseDto2));
 
             mockMvc.perform(get("/bookings/owner?from={from}&size={size}", from, size)
@@ -338,7 +344,7 @@ class BookingControllerTest {
                 .findAllBookingByOwnerId(ArgumentMatchers.eq(
                         itemDto.getOwnerId()),
                     ArgumentMatchers.eq(BookingState.ALL),
-                    ArgumentMatchers.eq(PageRequest.of(from / size, size)));
+                    ArgumentMatchers.eq(pageable));
         }
 
         @Test

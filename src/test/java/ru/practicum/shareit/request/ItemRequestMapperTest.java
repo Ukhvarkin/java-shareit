@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.item.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
@@ -37,7 +39,7 @@ class ItemRequestMapperTest {
     private final ItemRequest itemRequest = ItemRequest.builder()
         .id(1L)
         .description("itemRequest")
-        .requestorId(user)
+        .requestor(user)
         .created(dateTime)
         .build();
     private final ItemRequestDto itemRequestDto = ItemRequestDto.builder()
@@ -52,7 +54,7 @@ class ItemRequestMapperTest {
             ItemRequest result = itemRequestMapper.toItemRequest(itemRequestDto, user, dateTime);
 
             assertEquals(itemRequestDto.getDescription(), result.getDescription());
-            assertEquals(user.getName(), result.getRequestorId().getName());
+            assertEquals(user.getName(), result.getRequestor().getName());
             assertEquals(dateTime, result.getCreated());
         }
 

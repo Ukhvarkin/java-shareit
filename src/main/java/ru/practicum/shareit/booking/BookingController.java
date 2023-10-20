@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,7 +77,7 @@ public class BookingController {
         log.info("GET [http://localhost:8080/bookings] : " +
             "Получение списка всех бронирований текущего пользователя id: {}, state: {}", userId, state);
         return ResponseEntity.ok(bookingService.findAllBookingByUserId(userId, BookingState.stateValid(state),
-            PageRequest.of(from / size, size)));
+            PageRequest.of(from / size, size, Sort.by(Sort.Order.desc("start")))));
     }
 
     @GetMapping("/owner")
@@ -89,7 +90,7 @@ public class BookingController {
         log.info("GET [http://localhost:8080/bookings/owner] : " +
             "Получение списка бронирований для всех вещей текущего пользователя id: {}, state: {}", ownerId, state);
         return ResponseEntity.ok(bookingService.findAllBookingByOwnerId(ownerId, BookingState.stateValid(state),
-            PageRequest.of(from / size, size)));
+            PageRequest.of(from / size, size, Sort.by(Sort.Order.desc("start")))));
     }
 
 }

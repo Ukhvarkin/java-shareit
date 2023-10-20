@@ -7,9 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.item.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -47,7 +49,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id: " + requestorId));
         log.info("Найден пользователь с id: {}", user.getId());
 
-        List<ItemRequest> itemRequests = itemRequestRepository.findByRequestorId_IdOrderByCreatedAsc(requestorId);
+        List<ItemRequest> itemRequests = itemRequestRepository.findByRequestorId_IdOrderByCreatedDesc(requestorId);
         log.info("найдено : {} запросов пользователя", itemRequests.size());
 
 
@@ -61,7 +63,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             .collect(Collectors.groupingBy(ItemDto::getRequestId));
 
         List<ItemRequestResponseDto> result = itemRequests.stream()
-            .filter(itemRequest -> itemRequest.getRequestorId().getId().equals(requestorId))
+            .filter(itemRequest -> itemRequest.getRequestor().getId().equals(requestorId))
             .map((itemRequest) -> itemRequestMapper.toItemRequestResponseDto(
                 itemRequest,
                 null)

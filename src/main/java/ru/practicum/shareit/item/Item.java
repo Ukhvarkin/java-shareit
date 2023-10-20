@@ -62,7 +62,13 @@ public class Item {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Item)) return false;
-        return id != null && id.equals(((Item) o).getId());
+        Item other = (Item) o;
+        return Objects.equals(id, other.getId()) &&
+            Objects.equals(name, other.getName()) &&
+            Objects.equals(description, other.getDescription()) &&
+            Objects.equals(available, other.getAvailable()) &&
+            Objects.equals(owner, other.getOwner()) &&
+            Objects.equals(requestId, other.getRequestId());
     }
 
     @Override

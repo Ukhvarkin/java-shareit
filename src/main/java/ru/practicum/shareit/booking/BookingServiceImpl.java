@@ -117,26 +117,26 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case ALL:
-                result = bookingRepository.findByBookerIdOrderByStartDesc(userId, pageable).toList();
+                result = bookingRepository.findByBookerId(userId, pageable).toList();
                 break;
             case CURRENT:
-                result = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartAsc(
+                result = bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(
                     userId, time, time, pageable).toList();
                 break;
             case PAST:
-                result = bookingRepository.findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
+                result = bookingRepository.findByBookerIdAndEndBeforeAndStatusEquals(
                     userId, time, BookingStatus.APPROVED, pageable).toList();
                 break;
             case FUTURE:
-                result = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(
+                result = bookingRepository.findByBookerIdAndStartAfter(
                     userId, time, pageable).toList();
                 break;
             case WAITING:
-                result = bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(
+                result = bookingRepository.findByBookerIdAndStatusEquals(
                     userId, BookingStatus.WAITING, pageable).toList();
                 break;
             case REJECTED:
-                result = bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(
+                result = bookingRepository.findByBookerIdAndStatusEquals(
                     userId, BookingStatus.REJECTED, pageable).toList();
                 break;
         }
@@ -159,26 +159,26 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case ALL:
-                result = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId, pageable).toList();
+                result = bookingRepository.findByItemOwnerId(ownerId, pageable).toList();
                 break;
             case CURRENT:
-                result = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+                result = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfter(
                     ownerId, time, time, pageable).toList();
                 break;
             case PAST:
-                result = bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
+                result = bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEquals(
                     ownerId, time, BookingStatus.APPROVED, pageable).toList();
                 break;
             case FUTURE:
-                result = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(
+                result = bookingRepository.findByItemOwnerIdAndStartAfter(
                     ownerId, time, pageable).toList();
                 break;
             case WAITING:
-                result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(
+                result = bookingRepository.findByItemOwnerIdAndStatusEquals(
                     ownerId, BookingStatus.WAITING, pageable).toList();
                 break;
             case REJECTED:
-                result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(
+                result = bookingRepository.findByItemOwnerIdAndStatusEquals(
                     ownerId, BookingStatus.REJECTED, pageable).toList();
                 break;
         }

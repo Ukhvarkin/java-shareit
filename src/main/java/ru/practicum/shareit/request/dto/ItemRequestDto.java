@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,6 +24,6 @@ public class ItemRequestDto {
     Long id;
     @NotBlank
     String description;
-    Long requestor;
+    Long requestorId;
     LocalDateTime created;
 }

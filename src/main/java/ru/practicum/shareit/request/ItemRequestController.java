@@ -3,6 +3,7 @@ package ru.practicum.shareit.request;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -58,7 +61,8 @@ public class ItemRequestController {
     ) {
         log.info("GET [http://localhost:8080/requests] : " +
             "Запрос на получение всех запросов пользователем с id: {}", userId);
-        return ResponseEntity.ok(itemRequestService.findAllItemRequests(userId, PageRequest.of(from / size, size)));
+        return ResponseEntity.ok(itemRequestService.findAllItemRequests(userId, PageRequest.of(from / size, size,
+            Sort.by(Sort.Order.desc("created")))));
     }
 
     @GetMapping("/{requestId}")

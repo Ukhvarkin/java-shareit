@@ -55,7 +55,7 @@ class ItemRequestRepositoryTest {
     private final ItemRequest itemRequest = ItemRequest.builder()
         .id(1L)
         .description("description")
-        .requestorId(user2)
+        .requestor(user2)
         .created(localDateTime)
         .build();
 
@@ -99,7 +99,7 @@ class ItemRequestRepositoryTest {
         @DisplayName("Получить список, id: 2")
         public void shouldGetOneTest() {
             List<ItemRequest> itemsRequest =
-                itemRequestRepository.findByRequestorId_IdOrderByCreatedAsc(user2.getId());
+                itemRequestRepository.findByRequestorId_IdOrderByCreatedDesc(user2.getId());
             assertEquals(1, itemsRequest.size());
 
             ItemRequest itemRequestFromRepository = itemsRequest.get(0);
@@ -110,7 +110,7 @@ class ItemRequestRepositoryTest {
         @DisplayName("Получить пустой список, id: 1")
         public void shouldGetZeroIfNotRequests() {
             List<ItemRequest> itemsRequest =
-                itemRequestRepository.findByRequestorId_IdOrderByCreatedAsc(user1.getId());
+                itemRequestRepository.findByRequestorId_IdOrderByCreatedDesc(user1.getId());
 
             assertTrue(itemsRequest.isEmpty());
         }

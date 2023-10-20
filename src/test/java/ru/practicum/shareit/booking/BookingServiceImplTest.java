@@ -19,9 +19,9 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.ItemResponseDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -518,7 +518,7 @@ class BookingServiceImplTest {
         @Test
         public void shouldGetAllByUser() {
             userRepositoryWhen(user2);
-            when(bookingRepository.findByBookerIdOrderByStartDesc(user2.getId(), pageable))
+            when(bookingRepository.findByBookerId(user2.getId(), pageable))
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
@@ -530,7 +530,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, response);
             verify(bookingRepository, times(1))
-                .findByBookerIdOrderByStartDesc(user2.getId(), pageable);
+                .findByBookerId(user2.getId(), pageable);
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user2.getId());
         }
@@ -538,7 +538,7 @@ class BookingServiceImplTest {
         @Test
         public void shouldGetCurrentByUser() {
             userRepositoryWhen(user2);
-            when(bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartAsc(any(), any(), any(), any()))
+            when(bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
 
@@ -550,7 +550,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByBookerIdAndStartBeforeAndEndAfterOrderByStartAsc(any(), any(), any(), any());
+                .findByBookerIdAndStartBeforeAndEndAfter(any(), any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user2.getId());
         }
@@ -559,7 +559,7 @@ class BookingServiceImplTest {
         public void shouldGetPastByUser() {
             userRepositoryWhen(user2);
             when(
-                bookingRepository.findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any(), any()))
+                bookingRepository.findByBookerIdAndEndBeforeAndStatusEquals(any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
 
@@ -571,7 +571,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any(), any());
+                .findByBookerIdAndEndBeforeAndStatusEquals(any(), any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user2.getId());
         }
@@ -580,7 +580,7 @@ class BookingServiceImplTest {
         public void shouldGetFutureByUser() {
             userRepositoryWhen(user2);
             when(
-                bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(any(), any(), any()))
+                bookingRepository.findByBookerIdAndStartAfter(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
 
@@ -592,7 +592,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByBookerIdAndStartAfterOrderByStartDesc(any(), any(), any());
+                .findByBookerIdAndStartAfter(any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user2.getId());
         }
@@ -601,7 +601,7 @@ class BookingServiceImplTest {
         public void shouldGetWaitingByUser() {
             userRepositoryWhen(user2);
             when(
-                bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(any(), any(), any()))
+                bookingRepository.findByBookerIdAndStatusEquals(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
 
@@ -614,7 +614,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByBookerIdAndStatusEqualsOrderByStartDesc(any(), any(), any());
+                .findByBookerIdAndStatusEquals(any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user2.getId());
         }
@@ -623,7 +623,7 @@ class BookingServiceImplTest {
         public void shouldGetRejectByUser() {
             userRepositoryWhen(user2);
             when(
-                bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(any(), any(), any()))
+                bookingRepository.findByBookerIdAndStatusEquals(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
 
@@ -636,7 +636,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByBookerIdAndStatusEqualsOrderByStartDesc(any(), any(), any());
+                .findByBookerIdAndStatusEquals(any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user2.getId());
         }
@@ -644,7 +644,7 @@ class BookingServiceImplTest {
         @Test
         public void shouldGetAllEmptyIfNotUser() {
             userRepositoryWhen(user1);
-            when(bookingRepository.findByBookerIdOrderByStartDesc(user1.getId(), pageable))
+            when(bookingRepository.findByBookerId(user1.getId(), pageable))
                 .thenReturn(new PageImpl<>(List.of()));
 
             List<BookingResponseDto> response = bookingService.findAllBookingByUserId(user1.getId(), ALL, pageable);
@@ -652,14 +652,14 @@ class BookingServiceImplTest {
             assertTrue(response.isEmpty());
 
             verify(bookingRepository, times(1))
-                .findByBookerIdOrderByStartDesc(user1.getId(), pageable);
+                .findByBookerId(user1.getId(), pageable);
             verify(userRepository, times(1)).findById(user1.getId());
         }
 
         @Test
         public void shouldGetCurrentEmptyIfNotUser() {
             userRepositoryWhen(user1);
-            when(bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartAsc(any(), any(), any(), any()))
+            when(bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of()));
 
             List<BookingResponseDto> response = bookingService.findAllBookingByUserId(user1.getId(), CURRENT, pageable);
@@ -667,7 +667,7 @@ class BookingServiceImplTest {
             assertTrue(response.isEmpty());
 
             verify(bookingRepository, times(1))
-                .findByBookerIdAndStartBeforeAndEndAfterOrderByStartAsc(any(), any(), any(), any());
+                .findByBookerIdAndStartBeforeAndEndAfter(any(), any(), any(), any());
             verify(userRepository, times(1)).findById(user1.getId());
         }
 
@@ -675,7 +675,7 @@ class BookingServiceImplTest {
         public void shouldGetPastEmptyIfNotUser() {
             userRepositoryWhen(user1);
             when(
-                bookingRepository.findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any(), any()))
+                bookingRepository.findByBookerIdAndEndBeforeAndStatusEquals(any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of()));
 
             List<BookingResponseDto> response = bookingService.findAllBookingByUserId(user1.getId(), PAST, pageable);
@@ -683,14 +683,14 @@ class BookingServiceImplTest {
             assertTrue(response.isEmpty());
 
             verify(bookingRepository, times(1))
-                .findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any(), any());
+                .findByBookerIdAndEndBeforeAndStatusEquals(any(), any(), any(), any());
             verify(userRepository, times(1)).findById(user1.getId());
         }
 
         @Test
         public void shouldGetFutureEmptyIfNotUser() {
             userRepositoryWhen(user1);
-            when(bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(any(), any(), any()))
+            when(bookingRepository.findByBookerIdAndStartAfter(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of()));
 
             List<BookingResponseDto> response = bookingService.findAllBookingByUserId(user1.getId(), FUTURE, pageable);
@@ -698,14 +698,14 @@ class BookingServiceImplTest {
             assertTrue(response.isEmpty());
 
             verify(bookingRepository, times(1))
-                .findByBookerIdAndStartAfterOrderByStartDesc(any(), any(), any());
+                .findByBookerIdAndStartAfter(any(), any(), any());
             verify(userRepository, times(1)).findById(user1.getId());
         }
 
         @Test
         public void shouldGetWaitingEmptyIfNotUser() {
             userRepositoryWhen(user1);
-            when(bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(any(), any(), any()))
+            when(bookingRepository.findByBookerIdAndStatusEquals(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of()));
 
             List<BookingResponseDto> response =
@@ -714,14 +714,14 @@ class BookingServiceImplTest {
             assertTrue(response.isEmpty());
 
             verify(bookingRepository, times(1))
-                .findByBookerIdAndStatusEqualsOrderByStartDesc(any(), any(), any());
+                .findByBookerIdAndStatusEquals(any(), any(), any());
             verify(userRepository, times(1)).findById(user1.getId());
         }
 
         @Test
         public void shouldGetRejectEmptyIfNotUser() {
             userRepositoryWhen(user1);
-            when(bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(any(), any(), any()))
+            when(bookingRepository.findByBookerIdAndStatusEquals(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of()));
 
             List<BookingResponseDto> response =
@@ -730,7 +730,7 @@ class BookingServiceImplTest {
             assertTrue(response.isEmpty());
 
             verify(bookingRepository, times(1))
-                .findByBookerIdAndStatusEqualsOrderByStartDesc(any(), any(), any());
+                .findByBookerIdAndStatusEquals(any(), any(), any());
             verify(userRepository, times(1)).findById(user1.getId());
         }
     }
@@ -741,7 +741,7 @@ class BookingServiceImplTest {
         public void shouldGetAllByOwner() {
             userRepositoryWhen(user1);
             when(itemRepository.findAllByOwnerId(user1.getId())).thenReturn(List.of(item1));
-            when(bookingRepository.findByItemOwnerIdOrderByStartDesc(user1.getId(), pageable))
+            when(bookingRepository.findByItemOwnerId(user1.getId(), pageable))
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
@@ -753,7 +753,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, response);
             verify(bookingRepository, times(1))
-                .findByItemOwnerIdOrderByStartDesc(user1.getId(), pageable);
+                .findByItemOwnerId(user1.getId(), pageable);
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user1.getId());
         }
@@ -762,7 +762,7 @@ class BookingServiceImplTest {
         public void shouldGetCurrentByOwner() {
             userRepositoryWhen(user1);
             when(itemRepository.findAllByOwnerId(user1.getId())).thenReturn(List.of(item1));
-            when(bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(any(), any(), any(),
+            when(bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfter(any(), any(), any(),
                 any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
@@ -776,7 +776,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(any(), any(), any(), any());
+                .findByItemOwnerIdAndStartBeforeAndEndAfter(any(), any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user1.getId());
         }
@@ -786,7 +786,7 @@ class BookingServiceImplTest {
             userRepositoryWhen(user1);
             when(itemRepository.findAllByOwnerId(user1.getId())).thenReturn(List.of(item1));
             when(
-                bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any(),
+                bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEquals(any(), any(), any(),
                     any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
@@ -799,7 +799,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByItemOwnerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(any(), any(), any(), any());
+                .findByItemOwnerIdAndEndBeforeAndStatusEquals(any(), any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user1.getId());
         }
@@ -809,7 +809,7 @@ class BookingServiceImplTest {
             userRepositoryWhen(user1);
             when(itemRepository.findAllByOwnerId(user1.getId())).thenReturn(List.of(item1));
             when(
-                bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(any(), any(), any()))
+                bookingRepository.findByItemOwnerIdAndStartAfter(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
 
@@ -821,7 +821,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByItemOwnerIdAndStartAfterOrderByStartDesc(any(), any(), any());
+                .findByItemOwnerIdAndStartAfter(any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user1.getId());
         }
@@ -831,7 +831,7 @@ class BookingServiceImplTest {
             userRepositoryWhen(user1);
             when(itemRepository.findAllByOwnerId(user1.getId())).thenReturn(List.of(item1));
             when(
-                bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(any(), any(), any()))
+                bookingRepository.findByItemOwnerIdAndStatusEquals(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
 
@@ -844,7 +844,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByItemOwnerIdAndStatusEqualsOrderByStartDesc(any(), any(), any());
+                .findByItemOwnerIdAndStatusEquals(any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user1.getId());
         }
@@ -854,7 +854,7 @@ class BookingServiceImplTest {
             userRepositoryWhen(user1);
             when(itemRepository.findAllByOwnerId(user1.getId())).thenReturn(List.of(item1));
             when(
-                bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(any(), any(), any()))
+                bookingRepository.findByItemOwnerIdAndStatusEquals(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(booking)));
             when(bookingMapper.toBookingResponseDto(booking)).thenReturn(bookingResponseDto);
 
@@ -867,7 +867,7 @@ class BookingServiceImplTest {
 
             equalsChecker(booking, result);
             verify(bookingRepository, times(1))
-                .findByItemOwnerIdAndStatusEqualsOrderByStartDesc(any(), any(), any());
+                .findByItemOwnerIdAndStatusEquals(any(), any(), any());
             verify(bookingMapper, times(1)).toBookingResponseDto(booking);
             verify(userRepository, times(1)).findById(user1.getId());
         }

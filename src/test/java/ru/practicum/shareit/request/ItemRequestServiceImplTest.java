@@ -14,10 +14,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.ItemMapperImpl;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.ItemResponseDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -96,7 +98,7 @@ class ItemRequestServiceImplTest {
     private final ItemRequest itemRequest1 = ItemRequest.builder()
         .id(1L)
         .description("item description")
-        .requestorId(user2)
+        .requestor(user2)
         .created(dateTime)
         .build();
 
@@ -132,9 +134,9 @@ class ItemRequestServiceImplTest {
 
             assertEquals(itemRequest1, savedItemRequest);
             assertEquals(itemRequestDto.getDescription(), savedItemRequest.getDescription());
-            assertEquals(user2.getId(), savedItemRequest.getRequestorId().getId());
-            assertEquals(user2.getName(), savedItemRequest.getRequestorId().getName());
-            assertEquals(user2.getEmail(), savedItemRequest.getRequestorId().getEmail());
+            assertEquals(user2.getId(), savedItemRequest.getRequestor().getId());
+            assertEquals(user2.getName(), savedItemRequest.getRequestor().getName());
+            assertEquals(user2.getEmail(), savedItemRequest.getRequestor().getEmail());
             assertNotNull(savedItemRequest.getCreated());
         }
 
@@ -155,7 +157,7 @@ class ItemRequestServiceImplTest {
         @Test
         public void shouldGet() {
             when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
-            when(itemRequestRepository.findByRequestorId_IdOrderByCreatedAsc(user2.getId())).thenReturn(
+            when(itemRequestRepository.findByRequestorId_IdOrderByCreatedDesc(user2.getId())).thenReturn(
                 List.of(itemRequest1));
             when(itemRepository.findByRequestIdIn(List.of(1L))).thenReturn(List.of(item1));
             when(itemMapper.toItemDto(any())).thenCallRealMethod();
@@ -171,7 +173,7 @@ class ItemRequestServiceImplTest {
             assertEquals(itemRequest1.getDescription(), result.getDescription());
             assertEquals(itemRequest1.getCreated(), result.getCreated());
             verify(userRepository, times(1)).findById(user2.getId());
-            verify(itemRequestRepository, times(1)).findByRequestorId_IdOrderByCreatedAsc(user2.getId());
+            verify(itemRequestRepository, times(1)).findByRequestorId_IdOrderByCreatedDesc(user2.getId());
             verify(itemRepository, times(1)).findByRequestIdIn(List.of(1L));
             verify(itemMapper, times(1)).toItemDto(any());
             verify(itemRequestMapper, times(1)).toItemRequestResponseDto(any(), any());
@@ -180,7 +182,7 @@ class ItemRequestServiceImplTest {
         @Test
         public void shouldGetEmpty() {
             when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
-            when(itemRequestRepository.findByRequestorId_IdOrderByCreatedAsc(user1.getId()))
+            when(itemRequestRepository.findByRequestorId_IdOrderByCreatedDesc(user1.getId()))
                 .thenReturn(List.of());
 
             List<ItemRequestResponseDto> results = itemRequestService.findAllItemRequestByRequestorId(user1.getId());
@@ -188,7 +190,7 @@ class ItemRequestServiceImplTest {
             assertTrue(results.isEmpty());
             verify(userRepository, times(1)).findById(user1.getId());
             verify(itemRequestRepository, times(1))
-                .findByRequestorId_IdOrderByCreatedAsc(user1.getId());
+                .findByRequestorId_IdOrderByCreatedDesc(user1.getId());
         }
 
         @Test

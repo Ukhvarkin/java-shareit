@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
@@ -34,7 +35,7 @@ class BookingRepositoryTest {
 
     private final int from = 0;
     private final int size = 10;
-    private final Pageable pageable = PageRequest.of(from / size, size);
+    private final Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Order.desc("start")));
     private final LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
     private final User user1 = User.builder()
         .id(1L)
@@ -157,7 +158,7 @@ class BookingRepositoryTest {
         @DisplayName("Положительный тест")
         public void shouldGetAllTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdOrderByStartDesc(user2.getId(), pageable)
+                .findByBookerId(user2.getId(), pageable)
                 .get().collect(Collectors.toList());
 
             assertEquals(4, result.size());
@@ -170,7 +171,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
-            List<Booking> result = bookingRepository.findByBookerIdOrderByStartDesc(user1.getId(), pageable)
+            List<Booking> result = bookingRepository.findByBookerId(user1.getId(), pageable)
                 .get().collect(Collectors.toList());
 
             assertTrue(result.isEmpty());
@@ -186,7 +187,7 @@ class BookingRepositoryTest {
         @DisplayName("Положительный тест")
         public void shouldGetCurrentTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndStartBeforeAndEndAfterOrderByStartAsc(
+                .findByBookerIdAndStartBeforeAndEndAfter(
                     user2.getId(),
                     localDateTime,
                     localDateTime,
@@ -200,7 +201,7 @@ class BookingRepositoryTest {
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndStartBeforeAndEndAfterOrderByStartAsc(user1.getId(), localDateTime,
+                .findByBookerIdAndStartBeforeAndEndAfter(user1.getId(), localDateTime,
                     localDateTime, pageable).get().collect(Collectors.toList());
 
             assertTrue(result.isEmpty());
@@ -214,7 +215,7 @@ class BookingRepositoryTest {
         @DisplayName("Положительный тест")
         public void shouldGetPastTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
+                .findByBookerIdAndEndBeforeAndStatusEquals(
                     user2.getId(),
                     localDateTime,
                     BookingStatus.APPROVED,
@@ -228,7 +229,7 @@ class BookingRepositoryTest {
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
+                .findByBookerIdAndEndBeforeAndStatusEquals(
                     user1.getId(),
                     localDateTime,
                     BookingStatus.APPROVED,
@@ -245,7 +246,7 @@ class BookingRepositoryTest {
         @DisplayName("Положительный тест")
         public void shouldGetFutureTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndStartAfterOrderByStartDesc(
+                .findByBookerIdAndStartAfter(
                     user2.getId(),
                     localDateTime,
                     pageable)
@@ -260,7 +261,7 @@ class BookingRepositoryTest {
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndStartAfterOrderByStartDesc(
+                .findByBookerIdAndStartAfter(
                     user1.getId(),
                     localDateTime,
                     pageable)
@@ -277,7 +278,7 @@ class BookingRepositoryTest {
         @DisplayName("Положительный тест")
         public void shouldGetWaitingTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndStatusEqualsOrderByStartDesc(
+                .findByBookerIdAndStatusEquals(
                     user2.getId(),
                     BookingStatus.WAITING,
                     pageable)
@@ -291,7 +292,7 @@ class BookingRepositoryTest {
         @DisplayName("Положительный тест")
         public void shouldGetRejectedTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndStatusEqualsOrderByStartDesc(
+                .findByBookerIdAndStatusEquals(
                     user2.getId(),
                     BookingStatus.REJECTED,
                     pageable)
@@ -305,7 +306,7 @@ class BookingRepositoryTest {
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
             List<Booking> result = bookingRepository
-                .findByBookerIdAndStatusEqualsOrderByStartDesc(user1.getId(), BookingStatus.WAITING, pageable)
+                .findByBookerIdAndStatusEquals(user1.getId(), BookingStatus.WAITING, pageable)
                 .get().collect(Collectors.toList());
 
             assertTrue(result.isEmpty());
@@ -318,7 +319,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Положительный тест")
         public void shouldGetAllTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdOrderByStartDesc(
+            List<Booking> result = bookingRepository.findByItemOwnerId(
                     user1.getId(),
                     pageable)
                 .get().collect(Collectors.toList());
@@ -333,7 +334,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdOrderByStartDesc(user2.getId(), pageable)
+            List<Booking> result = bookingRepository.findByItemOwnerId(user2.getId(), pageable)
                 .get().collect(Collectors.toList());
 
             assertTrue(result.isEmpty());
@@ -348,7 +349,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Положительный тест")
         public void shouldGetCurrentTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfter(
                 user1.getId(),
                 localDateTime,
                 localDateTime,
@@ -361,7 +362,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfter(
                 user2.getId(), localDateTime, localDateTime, pageable).get().collect(Collectors.toList());
 
             assertTrue(result.isEmpty());
@@ -374,7 +375,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Положительный тест")
         public void shouldGetPastTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEquals(
                 user1.getId(),
                 localDateTime,
                 BookingStatus.APPROVED,
@@ -387,7 +388,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEqualsOrderByStartDesc(
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndEndBeforeAndStatusEquals(
                 user2.getId(), localDateTime, BookingStatus.APPROVED, pageable).get().collect(Collectors.toList());
 
             assertTrue(result.isEmpty());
@@ -400,7 +401,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Положительный тест")
         public void shouldGetFutureTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(user1.getId(),
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndStartAfter(user1.getId(),
                 localDateTime, pageable).get().collect(Collectors.toList());
 
             assertEquals(2, result.size());
@@ -411,7 +412,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(user2.getId(),
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndStartAfter(user2.getId(),
                 localDateTime, pageable).get().collect(Collectors.toList());
 
             assertTrue(result.isEmpty());
@@ -424,7 +425,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Положительный тест")
         public void shouldGetWaitingTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndStatusEquals(
                 user1.getId(),
                 BookingStatus.WAITING,
                 pageable).get().collect(Collectors.toList());
@@ -436,7 +437,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Положительный тест")
         public void shouldGetRejectedTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(user1.getId(),
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndStatusEquals(user1.getId(),
                 BookingStatus.REJECTED, pageable).get().collect(Collectors.toList());
 
             assertEquals(1, result.size());
@@ -446,7 +447,7 @@ class BookingRepositoryTest {
         @Test
         @DisplayName("Негативный тест")
         public void shouldGetEmptyTest() {
-            List<Booking> result = bookingRepository.findByItemOwnerIdAndStatusEqualsOrderByStartDesc(user2.getId(),
+            List<Booking> result = bookingRepository.findByItemOwnerIdAndStatusEquals(user2.getId(),
                 BookingStatus.WAITING, pageable).get().collect(Collectors.toList());
 
             assertTrue(result.isEmpty());

@@ -10,13 +10,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.item.ItemResponseDto;
-import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -77,7 +80,7 @@ class ItemRequestControllerTest {
     private final ItemRequestDto itemRequestDto = ItemRequestDto.builder()
         .id(1L)
         .description("description")
-        .requestor(userDto2.getId())
+        .requestorId(userDto2.getId())
         .created(localDateTime)
         .build();
 
@@ -114,8 +117,8 @@ class ItemRequestControllerTest {
                 itemRequestDto.getDescription());
             assertEquals(Objects.requireNonNull(response.getBody()).getCreated(),
                 itemRequestDto.getCreated());
-            assertEquals(Objects.requireNonNull(response.getBody()).getRequestor(),
-                itemRequestDto.getRequestor());
+            assertEquals(Objects.requireNonNull(response.getBody()).getRequestorId(),
+                itemRequestDto.getRequestorId());
 
         }
 
@@ -162,7 +165,7 @@ class ItemRequestControllerTest {
         @Test
         @DisplayName("Получение всех запросов пользователем")
         public void methodGet_AllItemRequestsTest() {
-            Pageable pageable = PageRequest.of(from / size, size);
+            Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Order.desc("created")));
 
             when(itemRequestService.findAllItemRequests(userDto2.getId(), pageable))
                 .thenReturn(List.of(itemRequestResponseDto));
