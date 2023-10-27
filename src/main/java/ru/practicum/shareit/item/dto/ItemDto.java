@@ -1,29 +1,29 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.item.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotNull;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequestDto {
+public class ItemDto {
     Long id;
     @NotBlank
+    String name;
+    @NotBlank
     String description;
-    Long requestorId;
-    LocalDateTime created;
+    @NotNull
+    Boolean available;
+    Long ownerId;
+    Long requestId;
+
 }

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -29,8 +31,8 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemDto> addItem(@RequestBody @Valid ItemDto itemDto,
-                                           @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
+    public ResponseEntity<ItemResponseDto> addItem(@RequestBody @Valid ItemResponseDto itemDto,
+                                                   @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
         log.info("POST [http://localhost:8080/items] : " +
             "Запрос создания вещи: {}, userId: {}", itemDto, userId);
         return ResponseEntity.ok(itemService.addItem(itemDto, userId));
@@ -47,9 +49,9 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> updateItem(@PathVariable Long itemId,
-                                              @RequestBody ItemDto itemDto,
-                                              @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
+    public ResponseEntity<ItemResponseDto> updateItem(@PathVariable Long itemId,
+                                                      @RequestBody ItemResponseDto itemDto,
+                                                      @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
         log.info("PATCH [http://localhost:8080/items/{}] : " +
             "Запрос редактирования вещи: {}, userId {}", itemId, itemDto, userId);
         itemDto.setId(itemId);
@@ -57,8 +59,8 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getItemById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                               @PathVariable Long itemId) {
+    public ResponseEntity<ItemResponseDto> getItemById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                       @PathVariable Long itemId) {
         log.info("GET [http://localhost:8080/items/{}] : " +
             "Запрос вещи по id", itemId);
 
@@ -66,24 +68,28 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getAllItems(
+    public ResponseEntity<List<ItemResponseDto>> getAllItems(
         @RequestHeader("X-Sharer-User-Id") @NonNull Long userId,
         @RequestParam(defaultValue = "0") int from,
-        @RequestParam(defaultValue = "10") int size) {
-        log.info("http://localhost:8080/items : " +
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        log.info("GET [http://localhost:8080/items] : " +
             "Запрос списка всех вещей пользователя с id: {}, from: {}, size: {}", userId, from, size);
-        List<ItemDto> items = itemService.findAllItemsByOwner(userId, from, size);
+        List<ItemResponseDto> items = itemService.findAllItemsByOwner(userId, from, size);
 
         return ResponseEntity.ok(items);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> search(@RequestParam String text) {
+    public ResponseEntity<List<ItemResponseDto>> search(
+        @RequestParam String text,
+        @RequestParam(defaultValue = "0") int from,
+        @RequestParam(defaultValue = "10") int size) {
         log.info(
             "GET [http://localhost:8080/items/search?text={}] : " +
                 "Запрос поиска вещей по названию и/или описанию",
             text
         );
-        return ResponseEntity.ok(itemService.search(text));
+        return ResponseEntity.ok(itemService.search(text, PageRequest.of(from / size, size)));
     }
 }

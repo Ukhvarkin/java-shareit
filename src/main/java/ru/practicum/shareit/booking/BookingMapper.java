@@ -5,9 +5,11 @@ import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserMapper;
 
-@Mapper
+@Mapper(componentModel = "spring", uses = {UserMapper.class, ItemMapper.class})
 public interface BookingMapper {
 
     @Mapping(target = "id", expression = "java(null)")

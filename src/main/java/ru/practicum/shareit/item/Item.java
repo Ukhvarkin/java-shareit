@@ -1,9 +1,12 @@
 package ru.practicum.shareit.item;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.item.comment.Comment;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.Column;
@@ -17,14 +20,19 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * TODO Sprint add-controllers.
  */
-@Data
+@Getter
+@Setter
 @Entity
+@Builder
+@ToString
 @Table(name = "items")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,11 +52,27 @@ public class Item {
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 
-    @ManyToOne
-    @JoinColumn(name = "request_id", referencedColumnName = "id")
-    private ItemRequest request;
+    @Column(name = "request_id")
+    Long requestId;
 
     @Transient
     private List<Comment> comments = new ArrayList<>();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item)) return false;
+        Item other = (Item) o;
+        return Objects.equals(id, other.getId()) &&
+            Objects.equals(name, other.getName()) &&
+            Objects.equals(description, other.getDescription()) &&
+            Objects.equals(available, other.getAvailable()) &&
+            Objects.equals(owner, other.getOwner()) &&
+            Objects.equals(requestId, other.getRequestId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, available, owner, requestId);
+    }
 }

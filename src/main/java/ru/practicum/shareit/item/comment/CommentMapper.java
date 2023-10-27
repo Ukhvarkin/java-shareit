@@ -7,7 +7,7 @@ import ru.practicum.shareit.user.User;
 
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CommentMapper {
     @Mapping(target = "authorName", source = "author.name")
     CommentDto toCommentDto(Comment comment);
