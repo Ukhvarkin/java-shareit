@@ -56,36 +56,6 @@ class UserControllerTest {
 
             assertEquals(objectMapper.writeValueAsString(userDtoToCreate), result);
         }
-
-        @Test
-        @DisplayName("Добавление нового пользователя - name : empty")
-        void methodPost_NewUserValidTrue_NameEmptyTest() throws Exception {
-            UserDto userDto = UserDto.builder()
-                .name("")
-                .email("mail@mail.ru")
-                .build();
-
-            mockMvc.perform(post("/users")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(userDto)))
-                .andExpect(status().is4xxClientError());
-        }
-
-        @Test
-        @DisplayName("Добавление нового пользователя - email : empty")
-        void methodPost_NewUserValidTrue_EmailEmptyTest() throws Exception {
-            UserDto userDto = UserDto.builder()
-                .name("name")
-                .email("")
-                .build();
-
-            mockMvc.perform(post("/users")
-                    .content(objectMapper.writeValueAsString(userDto))
-                    .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().is4xxClientError());
-        }
-
     }
 
     @Nested

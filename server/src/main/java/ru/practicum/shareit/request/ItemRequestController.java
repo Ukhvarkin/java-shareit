@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,25 +17,19 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-/**
- * TODO Sprint add-item-requests.
- */
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/requests")
-@Validated
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
     @PostMapping
     public ResponseEntity<ItemRequestDto> addItemRequest(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+        @RequestHeader("X-Sharer-User-Id") Long userId,
         @Valid @RequestBody ItemRequestDto itemRequestDto
     ) {
         log.info("POST [http://localhost:8080/requests] : " +
@@ -46,7 +39,7 @@ public class ItemRequestController {
 
     @GetMapping
     public ResponseEntity<List<ItemRequestResponseDto>> getItemRequestByRequestor(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId
+        @RequestHeader("X-Sharer-User-Id") Long userId
     ) {
         log.info("GET [http://localhost:8080/requests] : " +
             "Запрос на получение запросов пользователя с id: {}", userId);
@@ -55,9 +48,9 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<List<ItemRequestResponseDto>> getAllItemRequests(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
-        @Valid @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-        @Valid @RequestParam(defaultValue = "10") @Positive Integer size
+        @RequestHeader("X-Sharer-User-Id") Long userId,
+        @Valid @RequestParam(defaultValue = "0") Integer from,
+        @Valid @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("GET [http://localhost:8080/requests] : " +
             "Запрос на получение всех запросов пользователем с id: {}", userId);
@@ -67,7 +60,7 @@ public class ItemRequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<ItemRequestResponseDto> getItemRequestById(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+        @RequestHeader("X-Sharer-User-Id") Long userId,
         @PathVariable Long requestId
     ) {
         log.info("GET [http://localhost:8080/requests/{}] : " +

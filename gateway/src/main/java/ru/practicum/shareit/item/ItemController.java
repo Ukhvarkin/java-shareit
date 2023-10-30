@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Object> addItem(@RequestBody ItemResponseDto itemDto,
-                                          @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
+                                          @RequestHeader(X_SHARER_USER_ID) @NonNull Long userId) {
         log.info("Запрос создания вещи: {}, userId: {}", itemDto, userId);
         return itemClient.addItem(itemDto, userId);
     }
@@ -36,7 +38,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(@PathVariable Long itemId,
                                              @RequestBody CommentDto commentDto,
-                                             @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
+                                             @RequestHeader(X_SHARER_USER_ID) @NonNull Long userId) {
         log.info("Запрос создания комментария: {},itemId {}, userId: {}", itemId, commentDto, userId);
 
         return itemClient.addComment(itemId, commentDto, userId);
@@ -45,13 +47,13 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> updateItem(@PathVariable Long itemId,
                                              @RequestBody ItemResponseDto itemDto,
-                                             @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
+                                             @RequestHeader(X_SHARER_USER_ID) @NonNull Long userId) {
         log.info("Запрос редактирования вещи c id:{}, item {}, userId {}", itemId, itemDto, userId);
         return itemClient.updateItem(itemId, itemDto, userId);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<Object> getItemById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getItemById(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                               @PathVariable Long itemId) {
         log.info("Запрос вещи по id: {}", itemId);
 
@@ -60,7 +62,7 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getAllItems(
-        @RequestHeader("X-Sharer-User-Id") @NonNull Long userId,
+        @RequestHeader(X_SHARER_USER_ID) @NonNull Long userId,
         @RequestParam(defaultValue = "0") @PositiveOrZero int from,
         @RequestParam(defaultValue = "10") @Positive int size
     ) {
@@ -70,7 +72,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> search(
-        @RequestHeader("X-Sharer-User-Id") @NonNull Long userId,
+        @RequestHeader(X_SHARER_USER_ID) @NonNull Long userId,
         @RequestParam String text,
         @RequestParam(defaultValue = "0") @PositiveOrZero int from,
         @RequestParam(defaultValue = "10") @Positive int size) {

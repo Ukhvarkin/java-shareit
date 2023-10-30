@@ -16,10 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -33,7 +29,7 @@ public class BookingController {
     @PostMapping
     public BookingResponseDto addBooking(
         @RequestHeader("X-Sharer-User-Id") Long userId,
-        @RequestBody @Valid BookingRequestDto bookingDto
+        @RequestBody BookingRequestDto bookingDto
     ) {
         log.info("POST [http://localhost:8080/bookings] : " +
             "Запрос на бронирование: {}, userId {}", bookingDto, userId);
@@ -63,10 +59,10 @@ public class BookingController {
 
     @GetMapping
     public List<BookingResponseDto> findBookingByUserId(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+        @RequestHeader("X-Sharer-User-Id") Long userId,
         @RequestParam(required = false, defaultValue = "ALL") String state,
-        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-        @Positive @RequestParam(defaultValue = "10") Integer size
+        @RequestParam(defaultValue = "0") Integer from,
+        @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("GET [http://localhost:8080/bookings/{}] : " +
             "Получение списка всех бронирований текущего пользователя id: {}, state: {}", userId, userId, state);
@@ -76,10 +72,10 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingResponseDto> findBookingByOwnerId(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId,
+        @RequestHeader("X-Sharer-User-Id") Long ownerId,
         @RequestParam(required = false, defaultValue = "ALL") String state,
-        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-        @Positive @RequestParam(defaultValue = "10") Integer size
+        @RequestParam(defaultValue = "0") Integer from,
+        @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("GET [http://localhost:8080/bookings/owner] : " +
             "Получение списка бронирований для всех вещей текущего пользователя id: {}, state: {}", ownerId, state);

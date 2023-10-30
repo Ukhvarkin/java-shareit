@@ -21,6 +21,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class BookingController {
     private final BookingClient bookingClient;
 
     @PostMapping
-    public ResponseEntity<Object> bookItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+    public ResponseEntity<Object> bookItem(@RequestHeader(X_SHARER_USER_ID) @NotNull Long userId,
                                            @RequestBody @Valid BookingRequestDto bookingDto
     ) {
         log.info("Запрос на бронирование: {}, userId {}", bookingDto, userId);
@@ -39,7 +41,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseEntity<Object> update(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> update(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                          @PathVariable Long bookingId,
                                          @RequestParam Boolean approved) {
         log.info("Подтверждение или отклонение запроса на бронирование: " +
@@ -48,7 +50,7 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<Object> getBooking(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+    public ResponseEntity<Object> getBooking(@RequestHeader(X_SHARER_USER_ID) @NotNull Long userId,
                                              @PathVariable Long bookingId
     ) {
         log.info("Запрос бронирования по id: {}, пользователем с id: {}", bookingId, userId);
@@ -56,7 +58,7 @@ public class BookingController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> getBookingsByUser(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+    public ResponseEntity<Object> getBookingsByUser(@RequestHeader(X_SHARER_USER_ID) @NotNull Long userId,
                                                     @RequestParam(required = false, defaultValue = "ALL") String state,
                                                     @Valid @RequestParam(defaultValue = "0")
                                                     @PositiveOrZero Integer from,
@@ -67,7 +69,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<Object> getBookingsByOwner(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId,
+    public ResponseEntity<Object> getBookingsByOwner(@RequestHeader(X_SHARER_USER_ID) @NotNull Long ownerId,
                                                      @RequestParam(required = false, defaultValue = "ALL") String state,
                                                      @Valid @RequestParam(defaultValue = "0")
                                                      @PositiveOrZero Integer from,

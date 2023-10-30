@@ -18,6 +18,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ResponseEntity<Object> addItemRequest(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+        @RequestHeader(X_SHARER_USER_ID) @NotNull Long userId,
         @Valid @RequestBody ItemRequestDto itemRequestDto
     ) {
         log.info("POST [http://localhost:8080/requests] : " +
@@ -38,7 +40,7 @@ public class ItemRequestController {
 
     @GetMapping
     public ResponseEntity<Object> getItemRequestByRequestor(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId
+        @RequestHeader(X_SHARER_USER_ID) @NotNull Long userId
     ) {
         log.info("GET [http://localhost:8080/requests] : " +
             "Запрос на получение запросов пользователя с id: {}", userId);
@@ -47,7 +49,7 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllItemRequests(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+        @RequestHeader(X_SHARER_USER_ID) @NotNull Long userId,
         @Valid @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
         @Valid @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
@@ -58,7 +60,7 @@ public class ItemRequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<Object> getItemRequestById(
-        @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+        @RequestHeader(X_SHARER_USER_ID) @NotNull Long userId,
         @PathVariable Long requestId
     ) {
         log.info("GET [http://localhost:8080/requests/{}] : " +

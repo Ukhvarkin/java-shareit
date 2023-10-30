@@ -21,7 +21,6 @@ import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -126,55 +125,6 @@ class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingResponseDto1)));
 
-        }
-
-        @Test
-        @DisplayName("Добавление нового бронирования : item id: null")
-        public void methodPost_NewBooking_ItemIdNullTest() throws Exception {
-            bookingRequestDto.setItemId(null);
-
-            mockMvc.perform(post("/bookings")
-                    .header("X-Sharer-User-Id", user2.getId())
-                    .content(objectMapper.writeValueAsString(bookingRequestDto))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-            verify(bookingService, never()).addBooking(ArgumentMatchers.any(), ArgumentMatchers.any());
-        }
-
-        @Test
-        @DisplayName("Добавление нового бронирования : время начала в прошлом")
-        public void methodPost_NewBooking_StartInPastTest() throws Exception {
-            bookingRequestDto.setStart(LocalDateTime.now().minusMinutes(5));
-            bookingRequestDto.setEnd(LocalDateTime.now().plusMinutes(5));
-
-            mockMvc.perform(post("/bookings")
-                    .header("X-Sharer-User-Id", user2.getId())
-                    .content(objectMapper.writeValueAsString(bookingRequestDto))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-            verify(bookingService, never()).addBooking(ArgumentMatchers.any(), ArgumentMatchers.any());
-        }
-
-        @Test
-        @DisplayName("Добавление нового бронирования : время раньше времени старта")
-        public void methodPost_NewBooking_EndInPresentTest() throws Exception {
-            bookingRequestDto.setStart(LocalDateTime.now().plusMinutes(5));
-            bookingRequestDto.setEnd(LocalDateTime.now());
-
-            mockMvc.perform(post("/bookings")
-                    .header("X-Sharer-User-Id", user2.getId())
-                    .content(objectMapper.writeValueAsString(bookingRequestDto))
-                    .characterEncoding(StandardCharsets.UTF_8)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-            verify(bookingService, never()).addBooking(ArgumentMatchers.any(), ArgumentMatchers.any());
         }
     }
 

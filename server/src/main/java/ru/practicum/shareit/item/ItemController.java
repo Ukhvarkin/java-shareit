@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -17,12 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 
-import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -31,8 +26,8 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemResponseDto> addItem(@RequestBody @Valid ItemResponseDto itemDto,
-                                                   @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
+    public ResponseEntity<ItemResponseDto> addItem(@RequestBody ItemResponseDto itemDto,
+                                                   @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("POST [http://localhost:8080/items] : " +
             "Запрос создания вещи: {}, userId: {}", itemDto, userId);
         return ResponseEntity.ok(itemService.addItem(itemDto, userId));
@@ -41,7 +36,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> addComment(@PathVariable Long itemId,
                                                  @RequestBody CommentDto commentDto,
-                                                 @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
+                                                 @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("POST [http://localhost:8080/items/{}/comment] : " +
             "Запрос создания комментария: {}, userId: {}", itemId, commentDto, userId);
 
@@ -51,7 +46,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemResponseDto> updateItem(@PathVariable Long itemId,
                                                       @RequestBody ItemResponseDto itemDto,
-                                                      @RequestHeader("X-Sharer-User-Id") @NonNull Long userId) {
+                                                      @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("PATCH [http://localhost:8080/items/{}] : " +
             "Запрос редактирования вещи: {}, userId {}", itemId, itemDto, userId);
         itemDto.setId(itemId);
@@ -69,7 +64,7 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<List<ItemResponseDto>> getAllItems(
-        @RequestHeader("X-Sharer-User-Id") @NonNull Long userId,
+        @RequestHeader("X-Sharer-User-Id") Long userId,
         @RequestParam(defaultValue = "0") int from,
         @RequestParam(defaultValue = "10") int size
     ) {
